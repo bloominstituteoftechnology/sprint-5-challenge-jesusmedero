@@ -12,6 +12,15 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
   let mentors = [] // fix this
   let learners = [] // fix this
 
+  try {
+    const mentorsResponse = await axios.get('http://localhost:3003/api/mentors');
+    mentors = mentorsResponse.data;
+    
+    const learnersResponse = await axios.get('http://localhost:3003/api/learners');
+    learners = learnersResponse.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
   // 👆 ==================== TASK 1 END ====================== 👆
 
   // 👇 ==================== TASK 2 START ==================== 👇
@@ -28,6 +37,21 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
   //     "Grace Hopper"
   //   ]`
   // }
+  let mentorMap = new Map();
+mentors.forEach(mentor => {
+    let fullName = mentor.firstName + ' ' + mentor.lastName;
+    mentorMap.set(mentor.id, fullName);
+});
+
+learners.forEach(learner => {
+    learner.mentors = learner.mentors.map(mentorId => mentorMap.get(mentorId));
+});
+
+
+console.log(learners);
+
+
+
 
   // 👆 ==================== TASK 2 END ====================== 👆
 
@@ -47,11 +71,35 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
     // ❗ Fill each <li> with a mentor name, and append it to the <ul> mentorList.
     // ❗ Inspect the mock site closely to understand what the initial texts and classes look like!
 
-    const card = document.createElement('div')
-    const heading = document.createElement('h3')
-    const email = document.createElement('div')
-    const mentorsHeading = document.createElement('h4')
-    const mentorsList = document.createElement('ul')
+    const card = document.createElement('div');
+    card.classList.add('card');
+
+    const heading = document.createElement('h3');
+    heading.textContent = learner.fullName;
+    
+
+    const email = document.createElement('div');
+    email.textContent = learner.email;
+   
+
+    const mentorsHeading = document.createElement('h4');
+    mentorsHeading.classList.add('closed');
+    mentorsHeading.textContent = ('Mentors');
+    
+
+    const mentorsList = document.createElement('ul');
+    mentorsList.classList.add('mentorList');
+    learner.mentors.forEach(mentorName => {
+      const li = document.createElement('li');
+      li.textContent = mentorName;
+      mentorsList.appendChild(li);
+    });
+
+    card.appendChild(heading);
+    card.appendChild(email);
+    card.appendChild(mentorsHeading);
+    card.appendChild(mentorsList);
+   
 
     // 👆 ==================== TASK 3 END ====================== 👆
 
@@ -103,7 +151,6 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
   const currentYear = new Date().getFullYear()
   footer.textContent = `© BLOOM INSTITUTE OF TECHNOLOGY ${currentYear}`
 }
-
 // ❗ DO NOT CHANGE THIS CODE. WORK ONLY INSIDE TASKS 1, 2, 3
 if (typeof module !== 'undefined' && module.exports) module.exports = { sprintChallenge5 }
 else sprintChallenge5()
